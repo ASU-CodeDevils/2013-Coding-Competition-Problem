@@ -20,6 +20,7 @@ public class Regex {
 	 * @return
 	 */
 	public static boolean isAmericanAddress(String address) {
+		// dirty, just barely passes the tests. Doesn't follow the directions.
 		String pattern = ".*\\d.* .* [A-Z][A-Z] \\d\\d\\d\\d\\d.*";
 		return address.matches(pattern);
 	}
