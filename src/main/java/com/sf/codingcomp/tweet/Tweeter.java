@@ -1,10 +1,18 @@
 package com.sf.codingcomp.tweet;
 
-import java.util.List;
+import java.util.*;
 
 public class Tweeter {
 
 	public void tweet(String text, User user) throws TweetTooLongException {
+		if(text.length()>140) throw new TweetTooLongException();
+		Tweet thisTweet = new Tweet(text, user);
+		Feed tempFeed = user.getFeed();
+		List<Tweet> tempTweets = tempFeed.getTweets();
+		tempTweets.add(thisTweet);
+		tempFeed.setTweets(tempTweets);
+		user.setFeed(tempFeed);
+		
 		// TODO implement me
 	}
 
@@ -16,8 +24,22 @@ public class Tweeter {
 	 * @return
 	 */
 	public List<String> findMentions(User user) {
-		// TODO implement me
-		return null;
+		List<String> usernames = new ArrayList<String>();
+		Feed tempFeed = user.getFeed();
+		List<Tweet> tempTweets = tempFeed.getTweets();
+		for(Tweet tweet:tempTweets){
+			String s = tweet.getText();
+			for(int i = 0; i < s.length(); i++){
+				if(s.charAt(i)=='@'){
+					int temp = i;
+					do{
+						i++;
+					}while(s.charAt(i)!=' ' || i == s.length());
+					usernames.add(s.substring(temp, i));
+				}
+			}
+		}
+		return usernames;
 	}
 
 	/**

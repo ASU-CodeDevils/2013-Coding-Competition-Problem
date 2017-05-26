@@ -1,9 +1,13 @@
 package com.sf.codingcomp.tweet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
 
 	public String username;
 	public Feed feed = new Feed();
+	private List<User> following = new ArrayList<User>();
 
 	public String getUsername() {
 		return username;
@@ -22,11 +26,11 @@ public class User {
 	}
 
 	public void follow(User user) {
-		// TODO implement me
+		following.add(user);
 	}
 
 	public void unfollow(User user) {
-		// TODO implement me
+		following.remove(user);
 	}
 
 	public String toString() {
