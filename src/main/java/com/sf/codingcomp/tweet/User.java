@@ -23,6 +23,10 @@ public class User {
 	public String username;
 	public Feed feed = new Feed();
 	private List<User> following = new ArrayList<User>();
+	
+	public User(){
+		Tweeter.addUser(this);
+	}
 
 	public String getUsername() {
 		return username;

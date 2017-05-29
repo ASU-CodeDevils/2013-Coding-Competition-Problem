@@ -17,9 +17,11 @@ package com.sf.codingcomp.tweet;
 import java.util.*;
 
 public class Tweeter {
+	private static List<User> users = new ArrayList<User>();
 
 	public void tweet(String text, User user) throws TweetTooLongException {
 		if(text.length()>140) throw new TweetTooLongException();
+		// add tweet to the users feed
 		Tweet thisTweet = new Tweet(text, user);
 		Feed tempFeed = user.getFeed();
 		List<Tweet> tempTweets = tempFeed.getTweets();
@@ -27,7 +29,30 @@ public class Tweeter {
 		tempFeed.setTweets(tempTweets);
 		user.setFeed(tempFeed);
 		
-		// TODO implement me
+		// add tweet to the feed of all those mentioned in the tweet (@username)
+		for(int i = 0; i < text.length(); i++){
+			if(text.charAt(i)=='@'){
+				int temp = i+1;
+				do{
+					i++;
+				}while(text.charAt(i)!=' ' || i == text.length());
+				String mention = text.substring(temp, i);
+				for(User mentioned : users){
+					if(mentioned.getUsername().equals(mention) && !mentioned.getUsername().equals(user.getUsername())){
+						System.out.println("New tweet at: " + mentioned.getUsername());
+						tempFeed = mentioned.getFeed();
+						tempTweets = tempFeed.getTweets();
+						tempTweets.add(thisTweet);
+						tempFeed.setTweets(tempTweets);
+						mentioned.setFeed(tempFeed);
+					}
+				}
+			}
+		}
+		
+	}
+	public static void addUser(User user){
+		users.add(user);
 	}
 
 	/**
@@ -42,6 +67,9 @@ public class Tweeter {
 		Feed tempFeed = user.getFeed();
 		List<Tweet> tempTweets = tempFeed.getTweets();
 		for(Tweet tweet:tempTweets){
+			// uncomment below to not count mentions in feed by other authors
+			/*if(!tweet.getAuthor().equals(user.getUsername()))
+				continue;*/
 			String s = tweet.getText();
 			for(int i = 0; i < s.length(); i++){
 				if(s.charAt(i)=='@'){
@@ -49,10 +77,16 @@ public class Tweeter {
 					do{
 						i++;
 					}while(s.charAt(i)!=' ' || i == s.length());
-					usernames.add(s.substring(temp, i));
+					String mention = s.substring(temp, i);
+					//System.out.println(mention);
+					if(!usernames.contains(mention) && !mention.equals("@" + user.getUsername())) {
+						usernames.add(mention);
+						//System.out.println(usernames.toString());
+					}
 				}
 			}
 		}
+		Collections.sort(usernames);
 		return usernames;
 	}
 
