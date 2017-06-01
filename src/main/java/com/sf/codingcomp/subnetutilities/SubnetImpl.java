@@ -31,7 +31,15 @@ public class SubnetImpl implements Subnet {
 	}
 	
 	private InetAddress calcNetworkAddress(InetAddress subnet, int mask) throws UnknownHostException { 
-		int finalOctet = (mask / 8) + 1;
+		int finalOctet;
+		
+		if (mask == 32) { 
+			finalOctet = 4;
+			return subnet;
+		}
+		else { 
+			finalOctet = (mask/8) + 1;
+		}
 		int finalOctetBits = mask % 8;
 		int finalOctetValue = 0;
 		int exponent = 7;
@@ -43,7 +51,7 @@ public class SubnetImpl implements Subnet {
 		int numAddressPerSubnet = 256 - finalOctetValue;
 		int netAddressOctet = 0;
 		
-		while (subnet.getAddress()[finalOctet] > netAddressOctet ) { 
+		while (subnet.getAddress()[finalOctet - 1] > netAddressOctet ) { 
 			netAddressOctet+=numAddressPerSubnet;
 		}
 		netAddressOctet-= numAddressPerSubnet;
@@ -53,7 +61,7 @@ public class SubnetImpl implements Subnet {
 		for (int i = 1; i < finalOctet; i++) { 
 			netAddress[i-1] = subnet.getAddress()[i-1];
 		}
-		netAddress[finalOctet] = (byte) netAddressOctet;
+		netAddress[finalOctet - 1] = (byte) netAddressOctet;
 		
 		for (int i = 4; i > finalOctet; i--) { 
 			netAddress[i - 1] = 0;
@@ -71,7 +79,15 @@ public class SubnetImpl implements Subnet {
 	}
 	
 	private InetAddress calcBroadcastAddress(InetAddress netAddress, int mask) throws UnknownHostException { 
-		int finalOctet = (mask / 8) + 1;
+		int finalOctet;
+		
+		if (mask == 32) { 
+			finalOctet = 4;
+			return netAddress;
+		}
+		else { 
+			finalOctet = (mask/8) + 1;
+		}
 		int finalOctetBits = mask % 8;
 		int finalOctetValue = 0;
 		int exponent = 7;
@@ -82,7 +98,7 @@ public class SubnetImpl implements Subnet {
 		int numAddressPerSubnet = 256 - finalOctetValue;
 		int broadAddressOctet = 0;
 		
-		broadAddressOctet = netAddress.getAddress()[finalOctet] + numAddressPerSubnet - 1;
+		broadAddressOctet = netAddress.getAddress()[finalOctet - 1] + numAddressPerSubnet - 1;
 		
 		byte[] broadAddress = new byte[4];
 		
@@ -90,7 +106,7 @@ public class SubnetImpl implements Subnet {
 			broadAddress[i - 1] = netAddress.getAddress()[i - 1 ];
 		}
 		
-		broadAddress[finalOctet] = (byte) broadAddressOctet;
+		broadAddress[finalOctet - 1] = (byte) broadAddressOctet;
 		
 		for (int i = 4; i > finalOctet; i--) { 
 			broadAddress[i - 1] = (byte) 255;
