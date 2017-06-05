@@ -23,6 +23,7 @@ public class User {
 	private String username;
 	private Feed feed = new Feed();
 	private List<User> following = new ArrayList<User>();
+	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
 	private int authored = 0;
 	
 	public User(){
@@ -65,9 +66,38 @@ public class User {
 	}
 	
 	public void addTweet(Tweet tweet) {
+		String text = tweet.getText();
+		for(int i = 0; i < text.length(); i++){
+			if(text.charAt(i)=='#'){
+				int temp = i;
+				do{
+					i++;
+				}while(i < text.length() && text.charAt(i)!=' ');
+				String substring = text.substring(temp, i);
+				this.addHashtag(substring);
+			}
+		}
 		if(tweet.getAuthor().equals(this));
 			this.authored++;
 		feed.addTweet(tweet);
+	}
+	
+	public void addHashtag(String text) {
+		for(Hashtag hashtag: hashtags) {
+			if(hashtag.getText().equals(text)) {
+				hashtag.setOccurrences(hashtag.getOccurrences()+1);
+				return;
+			}
+		}
+		hashtags.add(new Hashtag(text, 1));
+	}
+	
+	public List<Hashtag> getHashtags(){
+		List<Hashtag> newHashtags = new ArrayList<Hashtag>();
+		for(Hashtag hashtag: hashtags){
+			newHashtags.add(hashtag);
+		}
+		return newHashtags;
 	}
 
 	public String toString() {

@@ -101,35 +101,30 @@ public class Tweeter {
 	 * @return
 	 */
 	public List<Hashtag> findMostPopularHashtags(User user, int howMany) {
-		List<Hashtag> hashtags = new ArrayList<Hashtag>();
-
-		Feed tempFeed = user.getFeed();
-		List<Tweet> tempTweets = tempFeed.getTweets();
-		for(Tweet tweet: tempTweets){
-			String text = tweet.getText();
-			for(int i = 0; i < text.length(); i++){
-				if(text.charAt(i)=='#'){
-					int temp = i+1;
-					do{
-						i++;
-					}while(text.charAt(i)!=' ' || i == text.length());
-					String mention = text.substring(temp, i);
-					boolean found = false;
-					for(Hashtag tag : hashtags){
-						if(tag.getText().equals(mention)){
-							// increment occurences by 1
-							tag.setOccurrences(tag.getOccurrences()+1);
-							break;
-						}
-						if(!found) {
-							hashtags.add(new Hashtag(mention, 1));
-						}
-					}
+		List<Hashtag> hashtags = user.getHashtags();
+		List<Hashtag> returnHashtags = new ArrayList<Hashtag>();
+		Hashtag tempHashtag = null;
+		for(int i = 0; i<howMany; i++){
+			if(hashtags.isEmpty())
+				break;
+			tempHashtag = null;
+			for(Hashtag hashtag: hashtags) {
+				if(tempHashtag == null) {
+					tempHashtag = hashtag;
+					continue;
+				}
+				if(tempHashtag.getOccurrences() < hashtag.getOccurrences()) {
+					tempHashtag = hashtag;
+					
 				}
 			}
+			returnHashtags.add(tempHashtag);
+			hashtags.remove(tempHashtag);
 		}
-		return hashtags;
+
+		return returnHashtags;
 	}
+	
 
 	/**
 	 * This method finds the most recent tweets authored by the user.
@@ -140,8 +135,16 @@ public class Tweeter {
 	 * @return
 	 */
 	public List<Tweet> findMostRecentTweets(User user, int howMany) {
-		// TODO implement me
-		return null;
+		List<Tweet> userTweets = user.getFeed().getTweets();
+		List<Tweet> tweets = new ArrayList<Tweet>();
+		
+		for(int i = userTweets.size()-1; i >=0; i--){
+			if(tweets.size()>= howMany)
+				break;
+			if(userTweets.get(i).getAuthor()==user)
+				tweets.add(userTweets.get(i));
+		}
+		return tweets;
 	}
 
 	/**
