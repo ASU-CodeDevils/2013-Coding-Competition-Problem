@@ -20,9 +20,10 @@ import java.util.List;
 
 public class User {
 
-	public String username;
-	public Feed feed = new Feed();
+	private String username;
+	private Feed feed = new Feed();
 	private List<User> following = new ArrayList<User>();
+	private int authored = 0;
 	
 	public User(){
 		Tweeter.addUser(this);
@@ -43,6 +44,10 @@ public class User {
 	public void setFeed(Feed feed) {
 		this.feed = feed;
 	}
+	
+	public int getAuthored() {
+		return this.authored;
+	}
 
 	public void follow(User user) {
 		following.add(user);
@@ -50,6 +55,19 @@ public class User {
 
 	public void unfollow(User user) {
 		following.remove(user);
+	}
+	
+	public boolean isFollowing(User user) {
+		for(User follow: following)
+			if(user.equals(follow))
+				return true;
+		return false;
+	}
+	
+	public void addTweet(Tweet tweet) {
+		if(tweet.getAuthor().equals(this));
+			this.authored++;
+		feed.addTweet(tweet);
 	}
 
 	public String toString() {

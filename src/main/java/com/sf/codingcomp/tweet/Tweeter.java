@@ -22,12 +22,8 @@ public class Tweeter {
 	public void tweet(String text, User user) throws TweetTooLongException {
 		if(text.length()>140) throw new TweetTooLongException();
 		// add tweet to the users feed
-		Tweet thisTweet = new Tweet(text, user);
-		Feed tempFeed = user.getFeed();
-		List<Tweet> tempTweets = tempFeed.getTweets();
-		tempTweets.add(thisTweet);
-		tempFeed.setTweets(tempTweets);
-		user.setFeed(tempFeed);
+		Tweet tweet = new Tweet(text, user);
+		user.addTweet(tweet);
 		
 		// add tweet to the feed of all those mentioned in the tweet (@username)
 		for(int i = 0; i < text.length(); i++){
@@ -40,17 +36,23 @@ public class Tweeter {
 				for(User mentioned : users){
 					if(mentioned.getUsername().equals(mention) && !mentioned.getUsername().equals(user.getUsername())){
 						System.out.println("New tweet at: " + mentioned.getUsername());
-						tempFeed = mentioned.getFeed();
-						tempTweets = tempFeed.getTweets();
-						tempTweets.add(thisTweet);
-						tempFeed.setTweets(tempTweets);
-						mentioned.setFeed(tempFeed);
+						mentioned.addTweet(tweet);
+						break;
 					}
 				}
 			}
 		}
 		
+		// add tweet to the feed of all those being followed by this user
+		for(User aUser : users){
+			if(aUser.isFollowing(user)){
+				aUser.addTweet(tweet);
+				break;
+			}
+		}
+		
 	}
+	
 	public static void addUser(User user){
 		users.add(user);
 	}
@@ -99,8 +101,34 @@ public class Tweeter {
 	 * @return
 	 */
 	public List<Hashtag> findMostPopularHashtags(User user, int howMany) {
-		// TODO implement me
-		return null;
+		List<Hashtag> hashtags = new ArrayList<Hashtag>();
+
+		Feed tempFeed = user.getFeed();
+		List<Tweet> tempTweets = tempFeed.getTweets();
+		for(Tweet tweet: tempTweets){
+			String text = tweet.getText();
+			for(int i = 0; i < text.length(); i++){
+				if(text.charAt(i)=='#'){
+					int temp = i+1;
+					do{
+						i++;
+					}while(text.charAt(i)!=' ' || i == text.length());
+					String mention = text.substring(temp, i);
+					boolean found = false;
+					for(Hashtag tag : hashtags){
+						if(tag.getText().equals(mention)){
+							// increment occurences by 1
+							tag.setOccurrences(tag.getOccurrences()+1);
+							break;
+						}
+						if(!found) {
+							hashtags.add(new Hashtag(mention, 1));
+						}
+					}
+				}
+			}
+		}
+		return hashtags;
 	}
 
 	/**
@@ -124,7 +152,18 @@ public class Tweeter {
 	 * @return
 	 */
 	public User findMostActiveFollower(User user) {
-		// TODO implement me
-		return null;
+		User mostActive = null;
+		for(User following: users){
+			if(following.isFollowing(user)){
+				if(mostActive == null) {
+					mostActive = following;
+					continue;
+				}
+				if(mostActive.getAuthored() < following.getAuthored())
+					mostActive = following;
+				
+			}
+		}
+		return mostActive;
 	}
 }
