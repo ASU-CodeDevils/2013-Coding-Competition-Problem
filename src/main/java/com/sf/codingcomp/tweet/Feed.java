@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Feed {
-
 	private List<Tweet> tweets = new ArrayList<Tweet>();
 
 	public List<Tweet> getTweets() {
@@ -14,5 +13,9 @@ public class Feed {
 	public void setTweets(List<Tweet> tweets) {
 		this.tweets = tweets;
 	}
-
+	public void addTweet(Tweet tweet) {
+		this.tweets.add(tweet);
+	}
+	
+	
 }
